@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yong.finance.persistence.dao.generate.ConsumeEntityMapper">
+  <resultMap id="BaseResultMap" type="com.yong.finance.persistence.entity.ConsumeEntity">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="finance_type" jdbcType="INTEGER" property="financeType" />
+    <result column="consume_type" jdbcType="INTEGER" property="consumeType" />
+    <result column="consume_detail" jdbcType="VARCHAR" property="consumeDetail" />
+    <result column="consume_money" jdbcType="DOUBLE" property="consumeMoney" />
+    <result column="consume_date" jdbcType="TIMESTAMP" property="consumeDate" />
+    <result column="consume_location" jdbcType="VARCHAR" property="consumeLocation" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="state" jdbcType="INTEGER" property="state" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+
+  <sql id="BaseSql">
+    c.id as id, c.user_id AS userId, c.finance_type AS financeType, c.consume_type AS consumeType,
+    c.consume_detail AS consumeDetail, c.consume_money AS consumeMoney, c.consume_date AS consumeDate,
+    c.consume_location AS consumeLocation, c.create_time AS createTime, c.update_time AS updateTime,
+    c.state AS state, c.remark AS remark
+  </sql>
+
+  <select id="getListByParams" parameterType="com.yong.finance.common.support.bean.ConsumeSearchBean" resultType="com.yong.finance.persistence.result.ConsumeResult">
+    SELECT <include refid="BaseSql"/>, ct.type_name as consumeTypeName
+    FROM z_consume c
+    LEFT JOIN z_consume_type ct on c.consume_type = ct.id
+    <where>
+      <trim suffixOverrides="and | or">
+        c.state = 1 and
+        <if test="financeType != null">
+          c.finance_type = #{financeType} and
+        </if>
+        <if test="consumeType != null">
+          c.consume_type = #{consumeType} and
+        </if>
+        <if test="searchName != null">
+          (c.consume_detail LIKE CONCAT('%', #{searchName}, '%') or c.remark LIKE CONCAT('%', #{searchName}, '%')) and
+        </if>
+        <if test="startDate != null">
+          c.consume_date <![CDATA[>]]> #{startDate} and
+        </if>
+        <if test="endDate != null">
+          c.consume_date <![CDATA[<]]> #{startDate} and
+        </if>
+      </trim>
+    </where>
+    ORDER BY c.consume_date DESC, c.create_time DESC
+  </select>
+</mapper>
